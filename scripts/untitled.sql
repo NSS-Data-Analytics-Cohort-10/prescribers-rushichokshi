@@ -1,5 +1,19 @@
 -- 1. How many npi numbers appear in the prescriber table but not in the prescription table?
 
+SELECT COUNT(npi)
+FROM prescriber
+EXCEPT
+SELECT npi
+FROM prescription
+
+
+SELECT npi
+FROM prescriber
+EXCEPT
+SELECT npi
+FROM prescription
+
+
 -- 2.
 --     a. Find the top five drugs (generic_name) prescribed by prescribers with the specialty of Family Practice.
 
