@@ -89,41 +89,140 @@ ORDER BY total_cost DESC;
 
 --     b. Which drug (generic_name) has the hightest total cost per day? **Bonus: Round your cost per day column to 2 decimal places. Google ROUND to see how this works.**
 
-SELECT
+
+SELECT generic_name, ROUND(SUM(total_drug_cost)/SUM(total_day_supply),2) AS daily_cost
 FROM prescription
 LEFT JOIN drug
+ USING (drug_name)
+GROUP BY generic_name
+ORDER BY daily_cost DESC;
 
-
-
-SELECT
-FROM
-
-SELECT
-FROM
+--ANSWER: C1 ESTERASE INHIBITOR
 
 
 
 -- 4. 
 --     a. For each drug in the drug table, return the drug name and then a column named 'drug_type' which says 'opioid' for drugs which have opioid_drug_flag = 'Y', says 'antibiotic' for those drugs which have antibiotic_drug_flag = 'Y', and says 'neither' for all other drugs.
 
+SELECT drug_name,
+CASE WHEN opioid_drug_flag='Y' THEN 'opioid'
+	WHEN antibiotic_drug_flag='Y' THEN 'antibiotic'
+	ELSE 'neither'
+	END AS drug_type
+FROM drug;
+
+
 --     b. Building off of the query you wrote for part a, determine whether more was spent (total_drug_cost) on opioids or on antibiotics. Hint: Format the total costs as MONEY for easier comparision.
+
+
+SELECT SUM(total_drug_cost) AS money,
+	CASE WHEN opioid_drug_flag ='Y' THEN 'opioid'
+	WHEN antibiotic_drug_flag = 'Y' THEN 'antibiotic'
+	ELSE 'neither' END AS drug_type
+FROM drug
+INNER JOIN prescription
+USING (drug_name)
+WHERE
+	CASE WHEN opioid_drug_flag ='Y' THEN 'opioid'
+	WHEN antibiotic_drug_flag = 'Y' THEN 'antibiotic'
+	ELSE 'neither' END<>'neither'
+GROUP BY 
+	CASE WHEN opioid_drug_flag ='Y' THEN 'opioid'
+	WHEN antibiotic_drug_flag = 'Y' THEN 'antibiotic'
+ 	ELSE 'neither' END;
+	
+-- ANSWER: 38435121.26	"antibiotic"; 105080626.37	"opioid"
+
+
 
 -- 5. 
 --     a. How many CBSAs are in Tennessee? **Warning:** The cbsa table contains information for all states, not just Tennessee.
 
+
+SELECT COUNT(DISTINCT cbsa)
+FROM cbsa
+WHERE cbsaname LIKE '%TN%';
+
+--ANSWER: 10
+
+
 --     b. Which cbsa has the largest combined population? Which has the smallest? Report the CBSA name and total population.
 
+SELECT *
+FROM cbsa
+
+SELECT COUNT(*)
+FROM cbsa
+
+SELECT *
+FROM population
+
+SELECT COUNT(*)
+FROM population
+
+SELECT *
+FROM fips_county
+
+SELECT cbsaname, fipscounty, SUM(population) as sum_pop
+FROM cbsa
+LEFT JOIN population
+USING (fipscounty)
+GROUP BY cbsaname
+ORDER BY cbsaname;
+
+
+
+
+
+SELECT DISTINCT (cbsaname) AS distinct_cbsaname, SUM(population) AS sum_population
+FROM CBSA
+INNER JOIN fips_county
+USING (fipscounty)
+INNER JOIN population
+USING (fipscounty)
+GROUP BY distinct_cbsaname
+order BY distinct_cbsaname DESC
+
+SELECT cbsaname, SUM(population) AS sum_population
+FROM CBSA
+INNER JOIN fips_county
+USING (fipscounty)
+INNER JOIN population
+USING (fipscounty)
+GROUP BY cbsaname
+order BY cbsaname DESC
+
+
 --     c. What is the largest (in terms of population) county which is not included in a CBSA? Report the county name and population.
+
+SELECT fips_county.county, SUM(population.population) AS population
+FROM fips_county
+INNER JOIN population
+USING (fipscounty)
+GROUP BY fips_county.county
+ORDER BY population DESC;
 
 -- 6. 
 --     a. Find all rows in the prescription table where total_claims is at least 3000. Report the drug_name and the total_claim_count.
 
+
 SELECT total_claim_count, drug_name
 FROM prescription
-WHERE total_claim_count>=3000
-ORDER BY
+WHERE total_claim_count >= 3000
+ORDER BY total_claim_count DESC;
+--Answer Oxcodone 4538
+
+
 
 --     b. For each instance that you found in part a, add a column that indicates whether the drug is an opioid.
+
+SELECT drug_name , total_claim_count, opioid_drug_flag
+FROM prescription
+INNER JOIN drug
+USING (drug_name)
+WHERE total_claim_count > 3000 
+	AND opioid_drug_flag ='Y'
+
 
 --     c. Add another column to you answer from the previous part which gives the prescriber first and last name associated with each row.
 
@@ -136,6 +235,8 @@ ORDER BY
 --     c. Finally, if you have not done so already, fill in any missing values for total_claim_count with 0. Hint - Google the COALESCE function.
 
 
+
+--BONUS
 
 
 -- 1. How many npi numbers appear in the prescriber table but not in the prescription table?
