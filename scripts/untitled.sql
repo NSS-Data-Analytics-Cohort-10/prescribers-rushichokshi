@@ -16,7 +16,7 @@ USING (npi)
 GROUP BY npi
 ORDER BY sum_claims DESC
 
-
+--ANSWER: npi: 1881634483, sum of claims: 99707
 
     
 --     b. Repeat the above, but this time report the nppes_provider_first_name, nppes_provider_last_org_name,  specialty_description, and the total number of claims.
@@ -230,6 +230,16 @@ ORDER BY total_claim_count DESC;
 -- 7. The goal of this exercise is to generate a full list of all pain management specialists in Nashville and the number of claims they had for each opioid. **Hint:** The results from all 3 parts will have 637 rows.
 
 --     a. First, create a list of all npi/drug_name combinations for pain management specialists (specialty_description = 'Pain Management) in the city of Nashville (nppes_provider_city = 'NASHVILLE'), where the drug is an opioid (opiod_drug_flag = 'Y'). **Warning:** Double-check your query before running it. You will only need to use the prescriber and drug tables since you don't need the claims numbers yet.
+
+SELECT prescription.npi, drug_name, specialty_description, nppes_provider_city, opioid_drug_flag
+FROM prescription
+INNER JOIN prescriber
+USING (npi)
+INNER JOIN drug
+USING (drug_name)
+WHERE specialty_description = 'Pain Management'
+AND nppes_provider_city = 'NASHVILLE'
+AND opioid_drug_flag = 'Y';
 
 --     b. Next, report the number of claims per drug per prescriber. Be sure to include all combinations, whether or not the prescriber had any claims. You should report the npi, the drug name, and the number of claims (total_claim_count).
 
